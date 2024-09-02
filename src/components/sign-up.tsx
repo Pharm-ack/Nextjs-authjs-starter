@@ -15,7 +15,7 @@ import { RegisterSchema } from "@/schema";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
 import PendingButton from "./pending-button";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Social from "./socials";
 
 type FormState = {
@@ -27,13 +27,9 @@ export default function SignUpForm() {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const router = useRouter();
+  const [urlError, setUrlError] = useState<string | null>(null);
 
-  const searchParams = useSearchParams();
-  const urlError =
-    searchParams.get("error") === "OAuthAccountNotLinked"
-      ? "Email already in use with different provider!"
-      : "";
+  const router = useRouter();
 
   const [formState, action] = useFormState<FormState, FormData>(
     async (prevState, formData) => {
@@ -63,8 +59,17 @@ export default function SignUpForm() {
   });
 
   useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const error = searchParams.get("error");
+    if (error === "OAuthAccountNotLinked") {
+      setUrlError("Email already in use with different provider!");
+    }
+  }, []);
+
+  useEffect(() => {
     if (urlError) {
       toast.error(urlError);
+      setUrlError(null);
     }
   }, [urlError]);
 

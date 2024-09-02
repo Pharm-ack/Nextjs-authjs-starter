@@ -1,11 +1,10 @@
 import { PrismaClient } from "@prisma/client";
-import { Pool, neonConfig } from "@neondatabase/serverless";
+import { Pool } from "@neondatabase/serverless";
 import { PrismaNeon } from "@prisma/adapter-neon";
 
 declare global {
   var prisma:
     | PrismaClient<{
-        omit: { user: { password: true } };
         adapter: PrismaNeon;
         log: ("warn" | "error")[];
       }>

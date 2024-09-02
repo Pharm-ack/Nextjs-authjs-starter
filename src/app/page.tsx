@@ -167,7 +167,11 @@ export default async function Component() {
                   size="lg"
                   className="rounded-full"
                 >
-                  <Link href="https://github.com/yourusername/nextjs-auth-starter">
+                  <Link
+                    href="https://github.com/Pharm-ack/Nextjs-authjs-starter"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <Github className="mr-2 h-4 w-4" />
                     View on GitHub
                   </Link>
@@ -309,7 +313,11 @@ export default async function Component() {
                   variant="secondary"
                   size="lg"
                 >
-                  <Link href="https://github.com/yourusername/nextjs-auth-starter">
+                  <Link
+                    href="https://github.com/Pharm-ack/Nextjs-authjs-starter"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <Github className="mr-2 h-4 w-4" />
                     Clone Repository
                   </Link>

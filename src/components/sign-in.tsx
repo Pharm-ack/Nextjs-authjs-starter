@@ -14,7 +14,7 @@ import { LoginSchema } from "@/schema";
 import { login } from "@/actions/actions";
 import PendingButton from "./pending-button";
 import { toast } from "sonner";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Social from "./socials";
 
 type FormState = {
@@ -25,13 +25,10 @@ type FormState = {
 export default function SignInForm() {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [urlError, setUrlError] = useState<string | null>(null);
+
   const router = useRouter();
 
-  const searchParams = useSearchParams();
-  const urlError =
-    searchParams.get("error") === "OAuthAccountNotLinked"
-      ? "Email already in use with different provider!"
-      : "";
   const [formState, action] = useFormState<FormState, FormData>(
     async (prevState, formData) => {
       const result = await login(prevState, formData);
@@ -60,8 +57,17 @@ export default function SignInForm() {
   });
 
   useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const error = searchParams.get("error");
+    if (error === "OAuthAccountNotLinked") {
+      setUrlError("Email already in use with different provider!");
+    }
+  }, []);
+
+  useEffect(() => {
     if (urlError) {
       toast.error(urlError);
+      setUrlError(null);
     }
   }, [urlError]);
 
