@@ -15,9 +15,17 @@ import {
   Key,
   Lock,
   LogOut,
+  Menu,
   Shield,
   Zap,
 } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import Link from "next/link";
 import { auth, signOut } from "@/auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -34,7 +42,7 @@ export default async function Component() {
           <Lock className="h-6 w-6 mr-2 text-primary" />
           <span className="font-bold text-xl">NextAuth Starter</span>
         </Link>
-        <nav className="flex items-center gap-4 sm:gap-6">
+        <nav className="hidden md:flex items-center gap-4 sm:gap-6">
           <Link
             className="text-sm font-medium hover:text-primary transition-colors"
             href="#features"
@@ -86,6 +94,54 @@ export default async function Component() {
             </Button>
           )}
         </nav>
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="sm" className="md:hidden">
+              <Menu />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right">
+            <SheetHeader>
+              <SheetTitle>Menu</SheetTitle>
+            </SheetHeader>
+            <nav className="flex flex-col gap-4 mt-4">
+              <Link
+                className="text-sm font-medium hover:text-primary transition-colors"
+                href="#features"
+              >
+                Features
+              </Link>
+              <Link
+                className="text-sm font-medium hover:text-primary transition-colors"
+                href="#tech-stack"
+              >
+                Tech Stack
+              </Link>
+              {session ? (
+                <form
+                  action={async () => {
+                    "use server";
+                    await signOut();
+                  }}
+                >
+                  <button className="w-full text-left flex items-center text-sm font-medium hover:text-primary transition-colors">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </button>
+                </form>
+              ) : (
+                <Button
+                  asChild
+                  variant="ghost"
+                  size="sm"
+                  className="w-full justify-start"
+                >
+                  <Link href="/auth/sign-in">Sign In</Link>
+                </Button>
+              )}
+            </nav>
+          </SheetContent>
+        </Sheet>
       </header>
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 px-4">
