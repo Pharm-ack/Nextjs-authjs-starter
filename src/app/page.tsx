@@ -33,8 +33,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 export default async function Component() {
   const session = await auth();
 
-  console.log(session);
-
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
       <header className="px-4 lg:px-6 h-16 flex items-center justify-between backdrop-blur-sm bg-white/30 dark:bg-gray-800/30 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
