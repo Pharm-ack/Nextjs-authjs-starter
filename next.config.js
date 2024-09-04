@@ -1,5 +1,5 @@
 module.exports = {
   experimental: {
-    optimizePackageImports: ["@prisma/client", "next-auth"],
+    optimizePackageImports: ["@neondatabase/serverless", "@prisma/adapter-neon"],
   },
 };
