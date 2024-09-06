@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect } from "react";
+import { motion, useAnimation } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -27,15 +31,29 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import Link from "next/link";
-import { auth, signOut } from "@/auth";
+import { useSession, signOut } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-export default async function Component() {
-  const session = await auth();
+export default function Component() {
+  const { data: session } = useSession();
+  const controls = useAnimation();
+
+  useEffect(() => {
+    controls.start((i) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: i * 0.1 },
+    }));
+  }, [controls]);
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-      <header className="px-4 lg:px-6 h-16 flex items-center justify-between backdrop-blur-sm bg-white/30 dark:bg-gray-800/30 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+      <motion.header
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="px-4 lg:px-6 h-16 flex items-center justify-between backdrop-blur-sm bg-white/30 dark:bg-gray-800/30 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50"
+      >
         <Link className="flex items-center justify-center" href="#">
           <Lock className="h-6 w-6 mr-2 text-primary" />
           <span className="font-bold text-xl">NextAuth Starter</span>
@@ -71,18 +89,9 @@ export default async function Component() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <form
-                    action={async () => {
-                      "use server";
-                      await signOut();
-                    }}
-                  >
-                    <button className="w-full text-left flex items-center">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Log out</span>
-                    </button>
-                  </form>
+                <DropdownMenuItem onClick={() => signOut()}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -116,23 +125,21 @@ export default async function Component() {
                 Tech Stack
               </Link>
               {session ? (
-                <form
-                  action={async () => {
-                    "use server";
-                    await signOut();
-                  }}
+                <Button
+                  onClick={() => signOut()}
+                  variant="ghost"
+                  size="sm"
+                  className="justify-start"
                 >
-                  <button className="w-full text-left flex items-center text-sm font-medium hover:text-primary transition-colors">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </button>
-                </form>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Log out</span>
+                </Button>
               ) : (
                 <Button
                   asChild
                   variant="ghost"
                   size="sm"
-                  className="w-full justify-start"
+                  className="justify-start"
                 >
                   <Link href="/auth/sign-in">Sign In</Link>
                 </Button>
@@ -140,30 +147,39 @@ export default async function Component() {
             </nav>
           </SheetContent>
         </Sheet>
-      </header>
+      </motion.header>
       <main className="flex-1">
         <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 px-4">
           <div className="container mx-auto">
-            <div className="flex flex-col items-center space-y-4 text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="flex flex-col items-center space-y-4 text-center"
+            >
               <div className="space-y-2">
                 <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl/none bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
                   Next.js 14 Auth Starter
                 </h1>
                 <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
                   Jumpstart your Next.js project with a powerful database
-                  strategy authentication system using Auth.js, Prisma, and
+                  strategy authentication system using Auth.js, Drizzle ORM, and
                   NeonDB. Secure, scalable, and easy to integrate.
                 </p>
               </div>
-              <div className="space-x-4">
-                <Button asChild size="lg" className="rounded-full">
+              <div className="flex flex-col sm:flex-row gap-4 sm:space-x-4 w-full max-w-md">
+                <Button
+                  asChild
+                  size="lg"
+                  className="rounded-full w-full sm:w-auto"
+                >
                   <Link href="/auth/sign-in">Get Started</Link>
                 </Button>
                 <Button
                   asChild
                   variant="outline"
                   size="lg"
-                  className="rounded-full"
+                  className="rounded-full w-full sm:w-auto"
                 >
                   <Link
                     href="https://github.com/Pharm-ack/Nextjs-authjs-starter"
@@ -175,9 +191,10 @@ export default async function Component() {
                   </Link>
                 </Button>
               </div>
-            </div>
+            </motion.div>
           </div>
         </section>
+
         <section
           id="features"
           className="w-full py-12 md:py-24 lg:py-32 bg-gray-100 dark:bg-gray-800"
@@ -187,41 +204,45 @@ export default async function Component() {
               Key Features
             </h2>
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              <Card className="bg-white dark:bg-gray-800 border-none shadow-lg hover:shadow-xl transition-shadow">
-                <CardHeader>
-                  <Shield className="h-12 w-12 mb-4 text-primary" />
-                  <CardTitle className="text-xl">Multi-Strategy Auth</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  Integrated with Auth.js for flexible authentication including
-                  Credentials, GitHub, and Google strategies.
-                </CardContent>
-              </Card>
-              <Card className="bg-white dark:bg-gray-800 border-none shadow-lg hover:shadow-xl transition-shadow">
-                <CardHeader>
-                  <Database className="h-12 w-12 mb-4 text-primary" />
-                  <CardTitle className="text-xl">Prisma ORM & NeonDB</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  Robust database management with Prisma ORM and NeonDB
-                  serverless PostgreSQL for efficient, scalable data handling.
-                </CardContent>
-              </Card>
-              <Card className="bg-white dark:bg-gray-800 border-none shadow-lg hover:shadow-xl transition-shadow">
-                <CardHeader>
-                  <Code className="h-12 w-12 mb-4 text-primary" />
-                  <CardTitle className="text-xl">
-                    Type-Safe Development
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  Leverage Zod for schema validation and Conform for type-safe
-                  form handling in your Next.js app.
-                </CardContent>
-              </Card>
+              {[
+                {
+                  icon: <Shield className="h-12 w-12 mb-4 text-primary" />,
+                  title: "Multi-Strategy Auth",
+                  content:
+                    "Integrated with Auth.js for flexible authentication including Credentials, GitHub, and Google strategies.",
+                },
+                {
+                  icon: <Database className="h-12 w-12 mb-4 text-primary" />,
+                  title: "Drizzle ORM & NeonDB",
+                  content:
+                    "Robust database management with Drizzle ORM and NeonDB serverless PostgreSQL for efficient, scalable data handling.",
+                },
+                {
+                  icon: <Code className="h-12 w-12 mb-4 text-primary" />,
+                  title: "Type-Safe Development",
+                  content:
+                    "Leverage Zod for schema validation and Conform for type-safe form handling in your Next.js app.",
+                },
+              ].map((feature, index) => (
+                <motion.div
+                  key={index}
+                  custom={index}
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={controls}
+                >
+                  <Card className="bg-white dark:bg-gray-800 border-none shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                    <CardHeader>
+                      {feature.icon}
+                      <CardTitle className="text-xl">{feature.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>{feature.content}</CardContent>
+                  </Card>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
+
         <section
           id="tech-stack"
           className="w-full py-12 md:py-24 lg:py-32 bg-white dark:bg-gray-900"
@@ -231,69 +252,70 @@ export default async function Component() {
               Tech Stack
             </h2>
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              <div className="flex flex-col items-center text-center space-y-4 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md">
-                <Zap className="h-12 w-12 text-primary" />
-                <div>
-                  <h3 className="font-bold text-lg">Next.js 14</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    React framework for server-rendered apps
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-col items-center text-center space-y-4 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md">
-                <Key className="h-12 w-12 text-primary" />
-                <div>
-                  <h3 className="font-bold text-lg">Auth.js (NextAuth)</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Authentication for Next.js
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-col items-center text-center space-y-4 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md">
-                <Database className="h-12 w-12 text-primary" />
-                <div>
-                  <h3 className="font-bold text-lg">Prisma & NeonDB</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    ORM and serverless PostgreSQL database
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-col items-center text-center space-y-4 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md">
-                <CheckCircle className="h-12 w-12 text-primary" />
-                <div>
-                  <h3 className="font-bold text-lg">Zod</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    TypeScript-first schema validation
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-col items-center text-center space-y-4 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md">
-                <Code className="h-12 w-12 text-primary" />
-                <div>
-                  <h3 className="font-bold text-lg">Conform</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Type-safe form validation library
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-col items-center text-center space-y-4 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md">
-                <Globe className="h-12 w-12 text-primary" />
-                <div>
-                  <h3 className="font-bold text-lg">Shadcn & Tailwind CSS</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    UI components and utility-first CSS
-                  </p>
-                </div>
-              </div>
+              {[
+                {
+                  icon: <Zap className="h-12 w-12 text-primary" />,
+                  title: "Next.js 14",
+                  description: "React framework for server-rendered apps",
+                },
+                {
+                  icon: <Key className="h-12 w-12 text-primary" />,
+                  title: "Auth.js (NextAuth)",
+                  description: "Authentication for Next.js",
+                },
+                {
+                  icon: <Database className="h-12 w-12 text-primary" />,
+                  title: "Drizzle ORM & NeonDB",
+                  description: "ORM and serverless PostgreSQL database",
+                },
+                {
+                  icon: <CheckCircle className="h-12 w-12 text-primary" />,
+                  title: "Zod",
+                  description: "TypeScript-first schema validation",
+                },
+                {
+                  icon: <Code className="h-12 w-12 text-primary" />,
+                  title: "Conform",
+                  description: "Type-safe form validation library",
+                },
+                {
+                  icon: <Globe className="h-12 w-12 text-primary" />,
+                  title: "Shadcn & Tailwind CSS",
+                  description: "UI components and utility-first CSS",
+                },
+              ].map((tech, index) => (
+                <motion.div
+                  key={index}
+                  custom={index}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={controls}
+                  whileHover={{ scale: 1.05 }}
+                  className="flex flex-col items-center text-center space-y-4 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md"
+                >
+                  {tech.icon}
+                  <div>
+                    <h3 className="font-bold text-lg">{tech.title}</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {tech.description}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
+
         <section
           id="get-started"
           className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-r from-primary to-purple-600 text-white"
         >
           <div className="container mx-auto px-4 md:px-6">
-            <div className="flex flex-col items-center space-y-4 text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="flex flex-col items-center space-y-4 text-center"
+            >
               <div className="space-y-2">
                 <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
                   Ready to Get Started?
@@ -321,11 +343,16 @@ export default async function Component() {
                   </Link>
                 </Button>
               </div>
-            </div>
+            </motion.div>
           </div>
         </section>
       </main>
-      <footer className="w-full py-6 bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+      <motion.footer
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full py-6 bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700"
+      >
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -347,7 +374,7 @@ export default async function Component() {
             </nav>
           </div>
         </div>
-      </footer>
+      </motion.footer>
     </div>
   );
 }
