@@ -1,5 +1,5 @@
 import type { NextAuthConfig } from "next-auth";
-import { PrismaAdapter } from "@auth/prisma-adapter";
+import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { v4 as uuid } from "uuid";
 import { encode as defaultEncode } from "next-auth/jwt";
 import credentials from "next-auth/providers/credentials";
@@ -7,9 +7,11 @@ import Google from "next-auth/providers/google";
 import Github from "next-auth/providers/github";
 import { LoginSchema } from "@/schema";
 import bcrypt from "bcryptjs";
-import { prisma } from "./lib/db";
+import { db } from "./lib/db";
+import { users } from "./lib/schema";
+import { eq } from "drizzle-orm";
 
-const adapter = PrismaAdapter(prisma);
+const adapter = DrizzleAdapter(db);
 
 const authConfig: NextAuthConfig = {
   // debug: true,
@@ -39,16 +41,17 @@ const authConfig: NextAuthConfig = {
 
         const { email, password } = result.data;
 
-        // Find the user by email
-        const user = await prisma.user.findUnique({
-          where: { email },
-          select: {
-            id: true,
-            email: true,
-            name: true,
-            password: true,
-          },
-        });
+        const userResults = await db
+          .select({
+            id: users.id,
+            email: users.email,
+            name: users.name,
+            password: users.password,
+          })
+          .from(users)
+          .where(eq(users.email, email));
+
+        const user = userResults[0];
 
         if (!user || !user.password) {
           return null;
@@ -72,10 +75,15 @@ const authConfig: NextAuthConfig = {
 
   events: {
     async linkAccount({ user }) {
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { emailVerified: new Date() },
-      });
+      if (user?.id) {
+        // Check if user.id exists
+        await db
+          .update(users)
+          .set({ emailVerified: new Date() })
+          .where(eq(users.id, user.id));
+      } else {
+        throw new Error("User ID is undefined");
+      }
     },
   },
   callbacks: {

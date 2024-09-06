@@ -3,9 +3,11 @@
 import { parseWithZod } from "@conform-to/zod";
 import { LoginSchema, RegisterSchema } from "@/schema";
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/db";
 import { signIn, signOut } from "@/auth";
 import { AuthError } from "next-auth";
+import { users } from "@/lib/schema";
+import { eq } from "drizzle-orm";
+import { db } from "@/lib/db";
 
 type FormState = {
   status: "success" | "error" | undefined;
@@ -30,13 +32,9 @@ export async function register(
   const { name, email, password } = submission.value;
 
   try {
-    const user = await prisma.user.findUnique({
-      where: {
-        email,
-      },
-    });
+    const user = await db.select().from(users).where(eq(users.email, email));
 
-    if (user) {
+    if (user.length > 0) {
       return {
         status: "error",
         message: "Email already exists",
@@ -45,13 +43,11 @@ export async function register(
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        image: "",
-      },
+    await db.insert(users).values({
+      name: name,
+      email: email,
+      password: hashedPassword,
+      image: "",
     });
     return {
       status: "success",
