@@ -1,5 +1,5 @@
 
-# Next.js 14 Authjs PrismaORM NoenDB ShadCN Starter Template 🚀
+# Next.js 14 Authjs DrizzleORM NoenDB ShadCN Starter Template 🚀
 
 ## Project Overview 📘
 
@@ -7,7 +7,7 @@ This repository provides a boilerplate for building a modern web application usi
 
 ## Live Demo 🌐
 
-Check out the live demo: [Live URL]() 
+Check out the live demo: [Live URL]("https://nextjs-authjs-starter.vercel.app") 
 
 ## Technologies Used 🛠️
 
@@ -16,7 +16,7 @@ Check out the live demo: [Live URL]()
   - [x] **Credentials**
   - [x] **GitHub**
   - [x] **Google**
-- 🗃️ **Prisma ORM**: Simplify Working With Databases.
+- 🗃️ **Drizzle ORM**: Type-safe SQL ORM for typescript
 - 🐘 **NeonDB**: Serverless Postgres Database.
 - 📏 **Zod**: TypeScript-first schema declaration and validation library.
 - 📝 **Conform**: A type-safe form validation library utilizing web fundamentals to progressively enhance HTML Forms with full support for server frameworks
@@ -60,7 +60,7 @@ You need to define your own `AUTH_SECRET` and `DATABASE_URL`.
 4. Run database migrations:
 
 ```bash
-npx prisma migrate dev
+npx drizzle-kit migrate
 ```
 
 5. Start the development server:
@@ -78,7 +78,7 @@ We welcome contributions to this project! To contribute, please follow these gui
 1. Fork the repository.
 2. Create a new branch with a descriptive name (`git checkout -b feature/your-feature-name`).
 3. Make your changes.
-4. Run the tests to ensure your changes don't break anything (`npm run test`).
+4. Run the tests to ensure your changes don't break anything (`pnpm run test`).
 5. Commit your changes (`git commit -m 'Add some feature'`).
 6. Push to the branch (`git push origin feature/your-feature-name`).
 7. Create a pull request.
